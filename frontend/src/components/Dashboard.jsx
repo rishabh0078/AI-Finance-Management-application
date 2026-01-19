@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  Wallet, 
-  TrendingUp, 
-  CreditCard, 
+import {
+  Wallet,
+  TrendingUp,
+  CreditCard,
   Target,
   Calendar,
   ArrowUpRight,
   ArrowDownRight,
   DollarSign,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  RefreshCw
 } from 'lucide-react';
 import StatsCard from './StatsCard';
 import RecentTransactions from './RecentTransactions';
@@ -22,11 +23,11 @@ import { useAuth } from '../context/AuthContext';
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const { 
-    balance, 
-    dashboardData, 
-    loading, 
-    error, 
+  const {
+    balance,
+    dashboardData,
+    loading,
+    error,
     loadDashboardData,
     clearError,
     budgets,
@@ -35,16 +36,20 @@ const Dashboard = () => {
 
   // State for month selection and view mode
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [viewMode, setViewMode] = useState('monthly'); // 'monthly' or 'alltime'
-  
+  const [viewMode, setViewMode] = useState('alltime'); // Default to all-time to show total balance first
+
   // State for modals
   const [transactionModalOpen, setTransactionModalOpen] = useState(false);
   const [transactionType, setTransactionType] = useState('expense');
   const [budgetModalOpen, setBudgetModalOpen] = useState(false);
   const [editingBudget, setEditingBudget] = useState(null);
 
+  // Debug logging
+  console.log('Dashboard Render:', { loading, error, balance, dashboardData });
+
   // Load dashboard data on component mount or when month/view changes
   useEffect(() => {
+    console.log('Loading dashboard data for:', viewMode, selectedDate);
     loadDashboardData(viewMode === 'monthly' ? selectedDate : null);
     loadBudgets(); // Load budgets for overview
   }, [loadDashboardData, loadBudgets, selectedDate, viewMode]);
@@ -64,8 +69,8 @@ const Dashboard = () => {
 
   // Format selected month for display
   const formattedMonth = selectedDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-  const isCurrentMonth = selectedDate.getMonth() === new Date().getMonth() && 
-                         selectedDate.getFullYear() === new Date().getFullYear();
+  const isCurrentMonth = selectedDate.getMonth() === new Date().getMonth() &&
+    selectedDate.getFullYear() === new Date().getFullYear();
 
   // Dynamic stats based on real data and view mode (3 stats + 1 budget tracker)
   const stats = [
@@ -108,12 +113,12 @@ const Dashboard = () => {
     // Check if there's an existing budget
     const budgetList = Array.isArray(budgets) ? budgets : [];
     const activeBudgets = budgetList.filter(b => b.isActive !== false);
-    
+
     // Prefer "Overall Budget" if it exists, otherwise use the first active budget
-    const existingBudget = activeBudgets.find(b => 
+    const existingBudget = activeBudgets.find(b =>
       b.category === 'Overall Budget' || b.category === 'Overall'
     ) || activeBudgets[0];
-    
+
     if (existingBudget) {
       // Open in edit mode with existing budget
       setEditingBudget(existingBudget);
@@ -121,7 +126,7 @@ const Dashboard = () => {
       // Open in create mode (no existing budget)
       setEditingBudget(null);
     }
-    
+
     setBudgetModalOpen(true);
   };
 
@@ -149,6 +154,18 @@ const Dashboard = () => {
     }
   ];
 
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex flex-col items-center">
+          <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-slate-600 font-medium">Loading your financial data...</p>
+        </div>
+      </div>
+    );
+  }
+
   // Show error if there's an issue loading data
   if (error) {
     return (
@@ -159,7 +176,7 @@ const Dashboard = () => {
           <button
             onClick={() => {
               clearError();
-              loadDashboardData();
+              loadDashboardData(viewMode === 'monthly' ? selectedDate : null);
             }}
             className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
           >
@@ -171,96 +188,105 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30">
+    <div className="min-h-screen pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Section */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between flex-wrap gap-4">
+        <div className="mb-10">
+          <div className="flex items-center justify-between flex-wrap gap-6">
             <div>
-              <h2 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
-                Welcome back{user?.name ? `, ${user.name}` : ''}!
+              <h2 className="text-4xl font-bold text-slate-900 tracking-tight">
+                Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">{user?.name}</span>!
               </h2>
-              <p className="text-gray-600 mt-3 flex items-center text-sm">
-                <Calendar className="w-4 h-4 mr-2 text-blue-500" />
-                <span className="font-medium">{viewMode === 'monthly' ? `Viewing ${formattedMonth}` : 'All-Time Overview'}</span>
+              <p className="text-slate-500 mt-2 flex items-center text-sm font-medium">
+                <Calendar className="w-4 h-4 mr-2 text-indigo-500" />
+                <span>{viewMode === 'monthly' ? `Financial Overview for ${formattedMonth}` : 'All-Time Financial Overview'}</span>
               </p>
             </div>
-          
-          {/* View Mode Toggle and Month Selector */}
-          <div className="flex items-center gap-3">
-            {/* View Mode Toggle */}
-            <div className="flex bg-white rounded-xl p-1.5 shadow-sm border border-gray-200">
-              <button
-                onClick={() => setViewMode('monthly')}
-                className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                  viewMode === 'monthly'
-                    ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md shadow-blue-500/30'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                }`}
-              >
-                Monthly
-              </button>
-              <button
-                onClick={() => setViewMode('alltime')}
-                className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                  viewMode === 'alltime'
-                    ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md shadow-blue-500/30'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                }`}
-              >
-                All-Time
-              </button>
-            </div>
 
-            {/* Month Selector Container - Fixed width to prevent layout shift */}
-            <div className="w-[180px]">
-              {viewMode === 'monthly' && (
-                <div className="flex items-center gap-1 bg-white border border-gray-200 rounded-xl px-2 py-2 shadow-sm">
-                  <button
-                    onClick={goToPreviousMonth}
-                    className="p-2 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:shadow-sm"
-                    title="Previous month"
-                  >
-                    <ChevronLeft className="w-4 h-4 text-gray-700" />
-                  </button>
-                  <button
-                    onClick={goToCurrentMonth}
-                    disabled={isCurrentMonth}
-                    className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 ${
-                      isCurrentMonth
-                        ? 'text-gray-400 cursor-not-allowed'
-                        : 'text-blue-600 hover:bg-blue-50 hover:shadow-sm'
+            {/* View Mode Toggle and Month Selector */}
+            <div className="flex flex-wrap items-center gap-4 bg-white/60 backdrop-blur-md p-2 rounded-2xl border border-white/50 shadow-sm">
+              {/* View Mode Toggle */}
+              <div className="flex bg-slate-100/80 rounded-xl p-1">
+                <button
+                  onClick={() => setViewMode('monthly')}
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${viewMode === 'monthly'
+                    ? 'bg-white text-indigo-600 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-700'
                     }`}
-                    title="Go to current month"
-                  >
-                    Today
-                  </button>
-                  <button
-                    onClick={goToNextMonth}
-                    className="p-2 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:shadow-sm"
-                    title="Next month"
-                  >
-                    <ChevronRight className="w-4 h-4 text-gray-700" />
-                  </button>
+                >
+                  Monthly
+                </button>
+                <button
+                  onClick={() => setViewMode('alltime')}
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${viewMode === 'alltime'
+                    ? 'bg-white text-indigo-600 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-700'
+                    }`}
+                >
+                  All-Time
+                </button>
+              </div>
+
+              {/* Month Selector Container */}
+              {viewMode === 'monthly' && (
+                <div className="w-[180px]">
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={goToPreviousMonth}
+                      className="p-2 hover:bg-white rounded-lg transition-all duration-200 hover:shadow-sm text-slate-600 hover:text-indigo-600"
+                      title="Previous month"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={goToCurrentMonth}
+                      disabled={isCurrentMonth}
+                      className={`flex-1 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 text-center ${isCurrentMonth
+                        ? 'text-slate-400 cursor-not-allowed bg-slate-50'
+                        : 'text-indigo-600 bg-indigo-50 hover:bg-indigo-100'
+                        }`}
+                      title="Go to current month"
+                    >
+                      {isCurrentMonth ? 'Current Month' : 'Back to Today'}
+                    </button>
+                    <button
+                      onClick={goToNextMonth}
+                      className="p-2 hover:bg-white rounded-lg transition-all duration-200 hover:shadow-sm text-slate-600 hover:text-indigo-600"
+                      title="Next month"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
-          </div>
-          
-          <div className="hidden lg:flex space-x-3">
-            {quickActions.map((action, index) => (
-              <button
-                key={index}
-                onClick={action.action}
-                className={`${action.color} text-white px-5 py-2.5 rounded-xl font-semibold transition-all duration-200 flex items-center space-x-2 shadow-md hover:shadow-lg hover:scale-105`}
-              >
-                {action.icon}
-                <span className="hidden xl:inline">{action.title}</span>
-              </button>
-            ))}
+
+            {/* Refresh Button */}
+            <button
+              onClick={() => {
+                loadDashboardData(viewMode === 'monthly' ? selectedDate : null);
+                loadBudgets();
+              }}
+              className="p-2.5 bg-white text-slate-600 hover:text-indigo-600 rounded-xl shadow-sm border border-gray-200 transition-all hover:shadow-md"
+              title="Refresh Data"
+            >
+              <RefreshCw className="w-5 h-5" />
+            </button>
+
+            <div className="hidden lg:flex space-x-3">
+              {quickActions.map((action, index) => (
+                <button
+                  key={index}
+                  onClick={action.action}
+                  className={`${action.color} text-white pl-4 pr-5 py-2.5 rounded-xl font-medium transition-all duration-200 flex items-center space-x-2 shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 hover:-translate-y-0.5`}
+                >
+                  {action.icon}
+                  <span className="hidden xl:inline">{action.title}</span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -279,27 +305,27 @@ const Dashboard = () => {
           </div>
 
           {/* Budget Overview - Takes 1 column */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 space-y-8">
             <BudgetOverview />
           </div>
         </div>
 
         {/* Mobile Quick Actions */}
         <div className="lg:hidden mt-8">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h3>
+          <h3 className="text-lg font-bold text-slate-900 mb-4 px-1">Quick Actions</h3>
           <div className="grid grid-cols-1 gap-3">
             {quickActions.map((action, index) => (
               <button
                 key={index}
                 onClick={action.action}
-                className={`${action.color} text-white p-5 rounded-2xl font-semibold transition-all duration-200 flex items-center space-x-4 shadow-lg hover:shadow-xl hover:scale-[1.02]`}
+                className={`${action.color} text-white p-5 rounded-2xl font-semibold transition-all duration-200 flex items-center space-x-4 shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-95`}
               >
-                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
                   {action.icon}
                 </div>
                 <div className="text-left flex-1">
                   <div className="font-bold text-base">{action.title}</div>
-                  <div className="text-sm opacity-90">{action.description}</div>
+                  <div className="text-sm opacity-90 font-medium">{action.description}</div>
                 </div>
               </button>
             ))}

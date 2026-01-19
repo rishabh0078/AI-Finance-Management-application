@@ -2,24 +2,24 @@ import React from 'react';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 
 const StatsCard = ({ title, value, change, changeType, icon, gradient = false }) => {
-  const changeColorClass = changeType === 'positive' 
-    ? 'text-green-600 bg-green-50 border border-green-100' 
-    : 'text-red-600 bg-red-50 border border-red-100';
+  const changeColorClass = changeType === 'positive'
+    ? 'text-emerald-700 bg-emerald-50 border border-emerald-100'
+    : 'text-rose-700 bg-rose-50 border border-rose-100';
 
-  const cardClass = gradient 
-    ? 'bg-gradient-to-br from-blue-500 via-blue-600 to-purple-600 text-white shadow-xl shadow-blue-500/20' 
-    : 'bg-white border border-gray-100 shadow-lg';
+  const cardClass = gradient
+    ? 'bg-gradient-to-br from-indigo-500 via-indigo-600 to-violet-600 text-white shadow-xl shadow-indigo-500/30'
+    : 'glass-card hover:border-indigo-100';
 
-  const textColorClass = gradient ? 'text-white' : 'text-gray-900';
-  const subtitleColorClass = gradient ? 'text-blue-50' : 'text-gray-500';
+  const textColorClass = gradient ? 'text-white' : 'text-slate-900';
+  const subtitleColorClass = gradient ? 'text-indigo-100' : 'text-slate-500';
 
   return (
-    <div className={`${cardClass} rounded-2xl p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 group`}>
+    <div className={`${cardClass} rounded-2xl p-6 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl group`}>
       <div className="flex items-center justify-between">
         <div className="flex-1">
-          <p className={`text-xs font-semibold uppercase tracking-wider ${subtitleColorClass} mb-2`}>{title}</p>
-          <p className={`text-3xl font-bold ${textColorClass} mb-4 group-hover:scale-105 transition-transform duration-200`}>{value}</p>
-          <div className={`inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold ${gradient ? 'bg-white/20 text-white backdrop-blur-sm' : changeColorClass}`}>
+          <p className={`text-xs font-bold uppercase tracking-wider ${subtitleColorClass} mb-3`}>{title}</p>
+          <p className={`text-3xl font-bold ${textColorClass} mb-4 tracking-tight`}>{value}</p>
+          <div className={`inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold ${gradient ? 'bg-white/20 text-white backdrop-blur-sm border border-white/20' : changeColorClass}`}>
             {changeType === 'positive' ? (
               <TrendingUp className="w-3.5 h-3.5 mr-1.5" />
             ) : (
@@ -28,8 +28,8 @@ const StatsCard = ({ title, value, change, changeType, icon, gradient = false })
             {change}
           </div>
         </div>
-        <div className={`p-4 rounded-2xl ${gradient ? 'bg-white/20 backdrop-blur-sm' : 'bg-gradient-to-br from-gray-50 to-gray-100'} group-hover:scale-110 transition-transform duration-200`}>
-          <div className={`${gradient ? 'text-white' : 'text-gray-700'}`}>
+        <div className={`p-4 rounded-xl ${gradient ? 'bg-white/20 backdrop-blur-sm border border-white/20' : 'bg-slate-50 group-hover:bg-indigo-50 group-hover:text-indigo-600'} transition-all duration-300`}>
+          <div className={`${gradient ? 'text-white' : 'text-slate-400 group-hover:text-indigo-600'}`}>
             {icon}
           </div>
         </div>

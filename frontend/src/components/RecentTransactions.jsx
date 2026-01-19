@@ -7,10 +7,10 @@ const RecentTransactions = ({ onEditTransaction }) => {
   const { dashboardData, deleteRecord, loadDashboardData } = useFinance();
   const [editingTransaction, setEditingTransaction] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  
+
   // Get transactions from context or use empty array
   const transactions = dashboardData?.recentRecords || [];
-  
+
   // Category to icon mapping
   const getCategoryIcon = (category) => {
     const iconMap = {
@@ -75,23 +75,26 @@ const RecentTransactions = ({ onEditTransaction }) => {
 
       <div className="space-y-3">
         {transactions.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
-            <p className="text-sm">No transactions yet</p>
-            <p className="text-xs mt-1">Start by adding your first transaction</p>
+          <div className="text-center py-12 text-gray-500 bg-gray-50/50 rounded-xl border border-gray-100 border-dashed">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <span className="text-2xl">📝</span>
+            </div>
+            <p className="font-medium text-gray-900">No transactions found</p>
+            <p className="text-sm mt-1">Try changing the date filter or add a new transaction.</p>
           </div>
         ) : (
           transactions.map((transaction) => {
             // Format date
             const transactionDate = new Date(transaction.date);
-            const formattedDate = transactionDate.toLocaleDateString('en-US', { 
-              month: 'short', 
+            const formattedDate = transactionDate.toLocaleDateString('en-US', {
+              month: 'short',
               day: 'numeric',
               year: transactionDate.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined
             });
-            
+
             // Calculate display amount (expenses are negative in DB)
             const displayAmount = transaction.type === 'expense' ? -transaction.amount : transaction.amount;
-            
+
             return (
               <div key={transaction._id} className="flex items-center justify-between p-4 hover:bg-gradient-to-r hover:from-gray-50 hover:to-blue-50/30 rounded-xl transition-all duration-200 group border border-transparent hover:border-gray-100">
                 <div className="flex items-center space-x-4 flex-1">

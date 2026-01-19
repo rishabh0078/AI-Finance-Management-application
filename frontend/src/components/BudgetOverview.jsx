@@ -22,12 +22,12 @@ const BudgetOverview = () => {
   const fetchAISuggestions = async () => {
     setIsLoadingAI(true);
     setAiError(null);
-    
+
     try {
       // Check if we have any financial data
       const hasData = balance && (
-        (balance.income > 0 || balance.expense > 0) || 
-        activeBudgets.length > 0 || 
+        (balance.income > 0 || balance.expense > 0) ||
+        activeBudgets.length > 0 ||
         (dashboardData?.recentRecords && dashboardData.recentRecords.length > 0)
       );
 
@@ -107,54 +107,33 @@ const BudgetOverview = () => {
         </div>
       )}
 
-      {/* Error State - Hide if credits issue, show friendly message otherwise */}
-      {aiError && !isLoadingAI && !aiError.includes('credits') && !aiError.includes('Insufficient') && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
+      {/* Error State */}
+      {aiError && !isLoadingAI && (
+        <div className={`rounded-xl p-5 border ${aiError.includes('API Key') ? 'bg-blue-50 border-blue-200' : 'bg-amber-50 border-amber-200'
+          }`}>
           <div className="flex items-start">
-            <AlertCircle className="w-5 h-5 text-amber-600 mr-3 flex-shrink-0 mt-0.5" />
+            <AlertCircle className={`w-5 h-5 mr-3 flex-shrink-0 mt-0.5 ${aiError.includes('API Key') ? 'text-blue-600' : 'text-amber-600'
+              }`} />
             <div className="flex-1">
-              <h4 className="text-sm font-semibold text-amber-800 mb-1">AI Suggestions Temporarily Unavailable</h4>
-              <p className="text-sm text-amber-700 mb-3">{aiError}</p>
+              <h4 className={`text-sm font-semibold mb-1 ${aiError.includes('API Key') ? 'text-blue-800' : 'text-amber-800'
+                }`}>
+                {aiError.includes('API Key') ? 'Configuration Required' : 'AI Service Unavailable'}
+              </h4>
+              <p className={`text-sm mb-3 ${aiError.includes('API Key') ? 'text-blue-700' : 'text-amber-700'
+                }`}>
+                {aiError}
+              </p>
               <button
                 onClick={fetchAISuggestions}
-                className="inline-flex items-center space-x-2 px-4 py-2 bg-amber-600 text-white rounded-lg font-medium hover:bg-amber-700 transition-colors text-sm"
+                className={`inline-flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-colors text-sm ${aiError.includes('API Key')
+                  ? 'bg-blue-600 text-white hover:bg-blue-700'
+                  : 'bg-amber-600 text-white hover:bg-amber-700'
+                  }`}
               >
                 <RefreshCw className="w-4 h-4" />
                 <span>Try again</span>
               </button>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* Credits Error - Show minimal, non-intrusive message */}
-      {aiError && !isLoadingAI && (aiError.includes('credits') || aiError.includes('Insufficient')) && (
-        <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 text-center">
-          <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Sparkles className="w-8 h-8 text-gray-400" />
-          </div>
-          <h4 className="text-sm font-semibold text-gray-700 mb-2">AI Feature Requires API Credits</h4>
-          <p className="text-xs text-gray-600 mb-4">
-            To use the AI Financial Advisor, your OpenRouter account needs credits. This feature is optional and the app works perfectly without it.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-2 justify-center">
-            <a
-              href="https://openrouter.ai/settings/credits"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center space-x-2 px-4 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors text-sm"
-            >
-              <span>Get Credits</span>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
-            </a>
-            <button
-              onClick={() => setAiError(null)}
-              className="inline-flex items-center justify-center px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-colors text-sm"
-            >
-              Dismiss
-            </button>
           </div>
         </div>
       )}
@@ -167,9 +146,12 @@ const BudgetOverview = () => {
               <Sparkles className="w-4 h-4 text-white" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-medium text-gray-800 leading-relaxed">
-                {aiSuggestions.replace(/^\d+\.\s*|^[-•*]\s*/gm, '').trim()}
-              </p>
+              <div className="text-sm font-medium text-gray-800 leading-relaxed whitespace-pre-wrap">
+                {(() => {
+                  const text = aiSuggestions.trim();
+                  return text.length > 500 ? text.substring(0, 500) + '...' : text;
+                })()}
+              </div>
             </div>
           </div>
         </div>
