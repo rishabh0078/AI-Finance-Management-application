@@ -1,6 +1,11 @@
-# FinanceTracker
+# AI Finance Management application
 
 A full-stack personal finance management app built with React and Node.js. Track income and expenses, set budgets, and view monthly or all-time financial summaries — all in one place.
+
+## Screenshots
+
+![Screenshot 1](./frontend/src/assets/ss1.png)
+![Screenshot 2](./frontend/src/assets/ss2.png)
 
 ## Tech Stack
 
