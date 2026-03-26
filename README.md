@@ -63,6 +63,7 @@ Create a `.env` file in the `frontend` folder:
 
 ```env
 VITE_BACKEND_URL=http://localhost:8000/api
+VITE_GEMINI_API_KEY=your_gemini_api_key
 ```
 
 Start the frontend dev server:
