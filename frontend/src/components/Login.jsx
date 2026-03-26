@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff, Mail, Lock, User, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, AlertCircle, TrendingUp, PieChart, Wallet, ArrowUpRight, Shield } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
@@ -11,7 +11,7 @@ const Login = () => {
     name: '',
     confirmPassword: ''
   });
-  
+
   const { login, register, loading, error, clearError } = useAuth();
 
   const handleInputChange = (e) => {
@@ -20,8 +20,6 @@ const Login = () => {
       ...prev,
       [name]: value
     }));
-    
-    // Clear error when user starts typing
     if (error) {
       clearError();
     }
@@ -29,11 +27,9 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (!isLogin && formData.password !== formData.confirmPassword) {
       return;
     }
-    
     try {
       if (isLogin) {
         await login({
@@ -48,7 +44,6 @@ const Login = () => {
         });
       }
     } catch (error) {
-      // Error is handled by the auth context
       console.error('Auth error:', error);
     }
   };
@@ -65,126 +60,190 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mb-4">
-            <User className="w-8 h-8 text-white" />
+    <div className="login-page">
+      {/* ===== Left Branded Panel ===== */}
+      <div className="login-brand-panel">
+        {/* Animated background orbs */}
+        <div className="login-orb login-orb-1" />
+        <div className="login-orb login-orb-2" />
+        <div className="login-orb login-orb-3" />
+
+        {/* Grid pattern overlay */}
+        <div className="login-grid-overlay" />
+
+        <div className="login-brand-content">
+          {/* Logo */}
+          <div className="login-logo">
+            <div className="login-logo-icon">
+              <Wallet size={28} strokeWidth={2} />
+            </div>
+            <span className="login-logo-text">FinanceTracker</span>
           </div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            FinanceTracker
-          </h1>
-          <p className="text-gray-600 mt-2">
-            {isLogin ? 'Welcome back!' : 'Create your account'}
-          </p>
+
+          {/* Hero Text */}
+          <div className="login-hero-text">
+            <h1>Take control of<br />your <span className="login-hero-highlight">finances</span></h1>
+            <p className="login-hero-sub">
+              Track expenses, set budgets, and gain insights into your spending
+              habits with AI-powered analytics.
+            </p>
+          </div>
+
+          {/* Floating Feature Cards */}
+          <div className="login-feature-cards">
+            <div className="login-feature-card">
+              <div className="login-feature-icon login-feature-icon-emerald">
+                <TrendingUp size={18} />
+              </div>
+              <div>
+                <div className="login-feature-title">Smart Analytics</div>
+                <div className="login-feature-desc">AI-powered spending insights</div>
+              </div>
+            </div>
+
+            <div className="login-feature-card">
+              <div className="login-feature-icon login-feature-icon-violet">
+                <PieChart size={18} />
+              </div>
+              <div>
+                <div className="login-feature-title">Budget Tracking</div>
+                <div className="login-feature-desc">Stay on top of your goals</div>
+              </div>
+            </div>
+
+            <div className="login-feature-card">
+              <div className="login-feature-icon login-feature-icon-amber">
+                <Shield size={18} />
+              </div>
+              <div>
+                <div className="login-feature-title">Bank-grade Security</div>
+                <div className="login-feature-desc">Your data is always safe</div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Form */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Bottom attribution */}
+        <div className="login-brand-footer">
+          <p>© 2026 FinanceTracker. Built with ❤️</p>
+        </div>
+      </div>
+
+      {/* ===== Right Form Panel ===== */}
+      <div className="login-form-panel">
+        <div className="login-form-container">
+          {/* Mobile logo (hidden on desktop) */}
+          <div className="login-mobile-logo">
+            <div className="login-logo-icon">
+              <Wallet size={24} strokeWidth={2} />
+            </div>
+            <span className="login-logo-text" style={{ fontSize: '1.25rem' }}>FinanceTracker</span>
+          </div>
+
+          <div className="login-form-header">
+            <h2>{isLogin ? 'Welcome back' : 'Create account'}</h2>
+            <p>{isLogin ? 'Enter your credentials to access your account' : 'Get started with your free account today'}</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="login-form">
             {/* Error Message */}
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center space-x-3">
-                <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-                <p className="text-red-700 text-sm">{error}</p>
+              <div className="login-error">
+                <AlertCircle size={16} />
+                <span>{error}</span>
               </div>
             )}
 
             {/* Name Field (Register only) */}
             {!isLogin && (
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                  Full Name
-                </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <div className="login-field" style={{ animationDelay: '0.05s' }}>
+                <label htmlFor="name">Full Name</label>
+                <div className="login-input-wrap">
+                  <User size={18} className="login-input-icon" />
                   <input
                     type="text"
                     id="name"
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                    placeholder="Enter your full name"
+                    placeholder="John Doe"
                     required={!isLogin}
+                    autoComplete="name"
                   />
                 </div>
               </div>
             )}
 
             {/* Email Field */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <div className="login-field">
+              <label htmlFor="email">Email address</label>
+              <div className="login-input-wrap">
+                <Mail size={18} className="login-input-icon" />
                 <input
                   type="email"
                   id="email"
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                  placeholder="Enter your email"
+                  placeholder="you@example.com"
                   required
+                  autoComplete="email"
                 />
               </div>
             </div>
 
             {/* Password Field */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <div className="login-field">
+              <div className="login-label-row">
+                <label htmlFor="password">Password</label>
+                {isLogin && (
+                  <button type="button" className="login-forgot-btn" tabIndex={-1}>
+                    Forgot password?
+                  </button>
+                )}
+              </div>
+              <div className="login-input-wrap">
+                <Lock size={18} className="login-input-icon" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   id="password"
                   name="password"
                   value={formData.password}
                   onChange={handleInputChange}
-                  className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                  placeholder="Enter your password"
+                  placeholder="••••••••"
                   required
+                  autoComplete={isLogin ? 'current-password' : 'new-password'}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="login-eye-btn"
+                  tabIndex={-1}
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
             </div>
 
             {/* Confirm Password Field (Register only) */}
             {!isLogin && (
-              <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                  Confirm Password
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <div className="login-field" style={{ animationDelay: '0.15s' }}>
+                <label htmlFor="confirmPassword">Confirm Password</label>
+                <div className={`login-input-wrap ${formData.confirmPassword && formData.password !== formData.confirmPassword ? 'login-input-error' : ''}`}>
+                  <Lock size={18} className="login-input-icon" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     id="confirmPassword"
                     name="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleInputChange}
-                    className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
-                      formData.confirmPassword && formData.password !== formData.confirmPassword
-                        ? 'border-red-300'
-                        : 'border-gray-300'
-                    }`}
-                    placeholder="Confirm your password"
+                    placeholder="••••••••"
                     required={!isLogin}
+                    autoComplete="new-password"
                   />
                 </div>
                 {formData.confirmPassword && formData.password !== formData.confirmPassword && (
-                  <p className="text-red-500 text-sm mt-1">Passwords do not match</p>
+                  <span className="login-field-error">Passwords do not match</span>
                 )}
               </div>
             )}
@@ -193,25 +252,31 @@ const Login = () => {
             <button
               type="submit"
               disabled={loading || (!isLogin && formData.password !== formData.confirmPassword)}
-              className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-3 px-4 rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              className="login-submit-btn"
             >
               {loading ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <div className="login-spinner" />
               ) : (
-                isLogin ? 'Sign In' : 'Create Account'
+                <>
+                  {isLogin ? 'Sign in' : 'Create account'}
+                  <ArrowUpRight size={18} style={{ marginLeft: '8px' }} />
+                </>
               )}
             </button>
           </form>
 
+          {/* Divider */}
+          <div className="login-divider">
+            <div className="login-divider-line" />
+            <span>or</span>
+            <div className="login-divider-line" />
+          </div>
+
           {/* Toggle Mode */}
-          <div className="mt-6 text-center">
-            <p className="text-gray-600">
+          <div className="login-toggle">
+            <p>
               {isLogin ? "Don't have an account?" : "Already have an account?"}
-              <button
-                type="button"
-                onClick={toggleMode}
-                className="ml-2 text-blue-600 hover:text-blue-700 font-medium transition-colors"
-              >
+              <button type="button" onClick={toggleMode} className="login-toggle-btn">
                 {isLogin ? 'Sign up' : 'Sign in'}
               </button>
             </p>

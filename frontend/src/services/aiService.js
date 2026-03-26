@@ -46,7 +46,7 @@ const aiService = {
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
                 console.error("Gemini API Error Detail:", errorData);
-                throw new Error(`AI Service Error: ${response.status} ${response.statusText} `);
+                throw new Error(`AI Service Error: ${response.status} ${errorData.error?.message || response.statusText}`);
             }
 
             const result = await response.json();
