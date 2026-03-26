@@ -47,7 +47,7 @@ CLIENT_URL=http://localhost:5173
 Start the backend server:
 
 ```bash
-npm run dev
+npm start
 ```
 
 ### 3. Setup the frontend
